@@ -2,14 +2,20 @@ import csv
 import sys
 import numpy as np
 from sklearn import linear_model
+<<<<<<< HEAD
 import matplotlib.pyplot as plt
+=======
+>>>>>>> 4c24c0ef702f1360893c647e358dde332bcffa1a
 
 dataset = sys.argv[1] if len(sys.argv) > 1 else "Bike-Sharing-Dataset/day.csv"
 
 X = []
 Y = []
 
-X_columns = ["atemp","hum","windspeed", ] # TODO(Bieber): Turn weekday into multiple indicator variables
+
+columns = []
+
+X_columns = ["workingday", "atemp","hum","windspeed"] # TODO(Bieber): Turn weekday into multiple indicator variables
 Y_columns = ["cnt"]
 
 X_indices = []
@@ -19,14 +25,32 @@ with open(dataset, 'rb') as csvfile:
     reader = csv.reader(csvfile)
     for i,row in enumerate(reader):
         if i == 0: # header
+            columns = row
             for j, col in enumerate(row):
                 if col in X_columns:
                     X_indices.append(j)
                 if col in Y_columns:
                     Y_indices.append(j)
         else:
-            X.append([float(row[j]) for j in X_indices])
-            Y.append([float(row[j]) for j in Y_indices])
+            x = []
+            y = []
+
+            for j, data in enumerate(row):
+                if columns[j] == "weekday":
+                    day = int(data)
+                    data = [0] * 6
+                    if day != 6:
+                        data[day] = 1
+                elif j in X_indices or j in Y_indices:
+                    data = [float(data)]
+
+                if j in X_indices:
+                    x.extend(data)
+                if j in Y_indices:
+                    y.extend(data)
+
+            X.append(x)
+            Y.append(y)
 
 clf = linear_model.LinearRegression()
 # clf = linear_model.Ridge(alpha = .5)
@@ -34,6 +58,7 @@ clfLasso = linear_model.Lasso(alpha = .2)
 
 print clf.fit(X, Y)
 print clf.coef_
+print clf.intercept_
 
 print clfLasso.fit(X, Y)
 print clfLasso.coef_
