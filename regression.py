@@ -2,14 +2,14 @@ import csv
 import sys
 import numpy as np
 from sklearn import linear_model
-import pylab as pl
+import matplotlib.pyplot as plt
 
 dataset = sys.argv[1] if len(sys.argv) > 1 else "Bike-Sharing-Dataset/day.csv"
 
 X = []
 Y = []
 
-X_columns = ["atemp","hum","windspeed"] # TODO(Bieber): Turn weekday into multiple indicator variables
+X_columns = ["atemp","hum","windspeed", ] # TODO(Bieber): Turn weekday into multiple indicator variables
 Y_columns = ["cnt"]
 
 X_indices = []
@@ -30,9 +30,19 @@ with open(dataset, 'rb') as csvfile:
 
 clf = linear_model.LinearRegression()
 # clf = linear_model.Ridge(alpha = .5)
-# clf = linear_model.Lasso(alpha = .2)
+clfLasso = linear_model.Lasso(alpha = .2)
 
 print clf.fit(X, Y)
 print clf.coef_
 
+print clfLasso.fit(X, Y)
+print clfLasso.coef_
 
+colors = ['r', 'g', 'b']
+
+for i in range(len(X_columns)):
+    plt.figure(i)
+    plt.scatter([x[i] for x in X], [y[0] for y in Y], c=colors[i])
+    plt.plot([x[i] for x in X], [clf.coef_[0][i]*x[i] for x in X], color='b')
+
+plt.show()
