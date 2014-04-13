@@ -10,7 +10,7 @@ Y = []
 
 columns = []
 
-X_columns = ["weekday", "atemp","hum","windspeed"] # TODO(Bieber): Turn weekday into multiple indicator variables
+X_columns = ["workingday", "atemp","hum","windspeed"] # TODO(Bieber): Turn weekday into multiple indicator variables
 Y_columns = ["cnt"]
 
 X_indices = []
@@ -53,5 +53,6 @@ clf = linear_model.LinearRegression()
 
 print clf.fit(X, Y)
 print clf.coef_
+print clf.intercept_
 
 
