@@ -2,10 +2,7 @@ import csv
 import sys
 import numpy as np
 from sklearn import linear_model
-<<<<<<< HEAD
 import matplotlib.pyplot as plt
-=======
->>>>>>> 4c24c0ef702f1360893c647e358dde332bcffa1a
 
 dataset = sys.argv[1] if len(sys.argv) > 1 else "Bike-Sharing-Dataset/day.csv"
 
