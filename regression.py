@@ -135,6 +135,8 @@ def plotLassoCoeffs():
     plt.ylabel("weight")
 
 def plotRidgeCoeffs():
+    if not CAN_PLOT:
+        return
     numVars = len(X_train[0])
     maxLen = 1000
     coeffs = np.array([linear_model.Ridge(alpha=a).fit(X_train,Y_train).coef_ for a in range(1,maxLen + 1)])
