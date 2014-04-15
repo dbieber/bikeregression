@@ -24,8 +24,8 @@ Y = []
 
 columns = []
 
-X_columns = ["yr", "workingday", "hum","windspeed", "atemp"]
-prettyNames = ["year", "workingday", "humidity", "windspeed", "temperature"]
+X_columns = ["yr", "workingday", "hum","windspeed", "atemp", "season"]
+prettyNames = ["year", "workingday", "humidity", "windspeed", "temperature", "temperature^2", "temperature^3", "winter", "spring", "summer"]
 Y_columns = ["cnt"]
 
 X_indices = []
@@ -53,6 +53,11 @@ with open(dataset, 'rb') as csvfile:
                         data[day] = 1
                 elif columns[j] == "atemp":
                     data = [float(data), float(data)**2, float(data)**3]
+                elif columns[j] == "season":
+                    season = int(data)
+                    data = [0] * 4
+                    if season != 4:
+                        data[season - 1] = 1
                 elif j in X_indices or j in Y_indices:
                     data = [float(data)]
 
@@ -80,7 +85,7 @@ print fit.coef_
 print ""
 
 kf = cross_validation.KFold(len(Y_train), n_folds=10, shuffle=True)
-clfLassoCV = linear_model.LassoCV(cv=kf)
+clfLassoCV = linear_model.LassoLarsCV(cv=kf)
 lassoCV = clfLassoCV.fit(X_train, Y_train)
 print "lasso:"
 print lassoCV.alpha_
@@ -121,15 +126,40 @@ def plotLassoCoeffs():
         else:
             plots[i], = plt.semilogx(filteredCoeffs[i])
 
+    plt.axvline(x=lassoCV.alpha_, color='k')
+    #plt.axis([1,1000,-4000,8000])
+    plt.gca().set_xlim([1,1000])
+
+    plt.legend(plots, prettyNames, loc='upper right', ncol=3, bbox_to_anchor=(1.5, 1.05))
+    plt.xlabel("alpha (l1 norm parameter)")
+    plt.ylabel("weight")
+
+def plotRidgeCoeffs():
+    numVars = len(X_train[0])
+    maxLen = 1000
+    coeffs = np.array([linear_model.Ridge(alpha=a).fit(X_train,Y_train).coef_ for a in range(1,maxLen + 1)])
+    filteredCoeffs = [coeffs[abs(coeffs[:,i]) > 0,i] for i in range(numVars)]
+
+    plots = [None] * numVars
+
+    for i in range(numVars):
+        if filteredCoeffs[i].shape[0] < maxLen:
+            plots[i], = plt.semilogx(np.append(filteredCoeffs[i], 0))
+        else:
+            plots[i], = plt.semilogx(filteredCoeffs[i])
+
     plt.axvline(x=ridgeCV.alpha_, color='k')
     #plt.axis([1,1000,-4000,8000])
     plt.gca().set_xlim([1,1000])
 
-    plt.legend(plots, prettyNames)
-    plt.xlabel("alpha (l1 norm parameter)")
+    plt.legend(plots, prettyNames, loc='upper right', ncol=3, bbox_to_anchor=(1.5, 1.05))
+    plt.xlabel("alpha (l2 norm parameter)")
     plt.ylabel("weight")
 
+plt.figure(1)
 plotLassoCoeffs()
+plt.figure(2)
+plotRidgeCoeffs()
 
 """
 normX = preprocessing.normalize(X, norm='l1', axis=0)
