@@ -2,7 +2,7 @@ import csv
 import sys
 import numpy as np
 
-CAN_PLOT = False
+CAN_PLOT = True
 if CAN_PLOT:
     import matplotlib.pyplot as plt
 else:
@@ -21,11 +21,10 @@ dataset = sys.argv[1] if len(sys.argv) > 1 else "Bike-Sharing-Dataset/day.csv"
 X = []
 Y = []
 
-
 columns = []
 
 X_columns = ["yr", "workingday", "hum","windspeed", "atemp", "season"]
-prettyNames = ["year", "workingday", "humidity", "windspeed", "temperature", "temperature^2", "temperature^3", "winter", "spring", "summer"]
+prettyNames = ["winter", "spring", "summer", "year", "workingday", "temperature", "temperature^2", "temperature^3", "humidity", "windspeed"]
 Y_columns = ["cnt"]
 
 X_indices = []
@@ -55,7 +54,7 @@ with open(dataset, 'rb') as csvfile:
                     data = [float(data), float(data)**2, float(data)**3]
                 elif columns[j] == "season":
                     season = int(data)
-                    data = [0] * 4
+                    data = [0] * 3
                     if season != 4:
                         data[season - 1] = 1
                 elif j in X_indices or j in Y_indices:
@@ -130,11 +129,13 @@ def plotLassoCoeffs():
     #plt.axis([1,1000,-4000,8000])
     plt.gca().set_xlim([1,1000])
 
-    plt.legend(plots, prettyNames, loc='upper right', ncol=3, bbox_to_anchor=(1.5, 1.05))
+    plt.legend(plots, prettyNames, loc='upper right', ncol=3, bbox_to_anchor=(1.1, 1.05))
     plt.xlabel("alpha (l1 norm parameter)")
     plt.ylabel("weight")
 
 def plotRidgeCoeffs():
+    if not CAN_PLOT:
+        return
     numVars = len(X_train[0])
     maxLen = 1000
     coeffs = np.array([linear_model.Ridge(alpha=a).fit(X_train,Y_train).coef_ for a in range(1,maxLen + 1)])
@@ -152,7 +153,7 @@ def plotRidgeCoeffs():
     #plt.axis([1,1000,-4000,8000])
     plt.gca().set_xlim([1,1000])
 
-    plt.legend(plots, prettyNames, loc='upper right', ncol=3, bbox_to_anchor=(1.5, 1.05))
+    plt.legend(plots, prettyNames, loc='upper right', ncol=3, bbox_to_anchor=(1.1, 1.05))
     plt.xlabel("alpha (l2 norm parameter)")
     plt.ylabel("weight")
 
