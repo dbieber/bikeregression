@@ -24,8 +24,8 @@ Y = []
 
 columns = []
 
-X_columns = ["yr"]#, "workingday", "hum","windspeed", "atemp"]
-prettyNames = ["year"]#, "workingday", "humidity", "windspeed", "temperature"]
+X_columns = ["yr", "workingday", "hum","windspeed", "atemp"]
+prettyNames = ["year", "workingday", "humidity", "windspeed", "temperature"]
 Y_columns = ["cnt"]
 
 X_indices = []
