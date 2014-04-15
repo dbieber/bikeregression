@@ -1,7 +1,18 @@
 import csv
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
+
+CAN_PLOT = False
+if CAN_PLOT:
+    import matplotlib.pyplot as plt
+else:
+    class DoNothing():
+        def __getattr__(self, name):
+            def k(*a, **b):
+                return DoNothing()
+            return k
+
+    plt = DoNothing()
 
 from sklearn import linear_model, preprocessing, cross_validation
 
@@ -100,6 +111,8 @@ print "lasso: ", lassoCV.score(X_test, Y_test)
 print "ridge: ", ridgeCV.score(X_test, Y_test)
 
 def plotLassoCoeffs():
+    if not CAN_PLOT:
+        return
     numVars = len(X_train[0])
     maxLen = 400
     coeffs = np.array([linear_model.Lasso(alpha=a).fit(X_train,Y_train).coef_ for a in range(1,maxLen + 1)])
